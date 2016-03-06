@@ -1,0 +1,26 @@
+model {
+	for (i in 1:n) {
+		y[i] ~ dnorm(mu[i], tauy)
+		mu[i] <- beta[1] + beta[2]*x[i]  + beta[3]*z[i]
+		x[i] ~ dnorm(mux[i], taux)
+		mux[i] <- gamma[1] + gamma[2]*z[i]
+		w1[i] ~ dnorm(x[i], tauu)
+	}
+	for (i in 1:n1) {
+		w2[i] ~ dnorm(x[i], tauu)
+	}
+
+	tauu ~ dgamma(tauu_alpha, tauu_beta)
+	sigmau <- pow(tauu, -0.5)
+
+	gamma ~ dmnorm(gammamean,gammaprec)
+	
+	taux ~ dgamma(taux_alpha, taux_beta)
+	sigmax <- pow(taux, -0.5)
+	
+	lambda <- (sigmax^2)/(sigmax^2+sigmau^2)
+
+	beta ~ dmnorm(betamean,betaprec)
+
+	tauy ~ dgamma(tauy_alpha, tauy_beta)
+}

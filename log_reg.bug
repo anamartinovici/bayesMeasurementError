@@ -1,0 +1,20 @@
+model {
+	for (i in 1:n) {
+		y[i] ~ dbern(mu[i])
+		logit(mu[i]) <- beta[1] + beta[2]*x[i]  + beta[3]*z[i]
+		x[i] ~ dnorm(mux[i], taux)
+		mux[i] <- gamma[1] + gamma[2]*z[i]
+		w1[i] ~ dnorm(x[i], tauu)
+	}
+	for (i in 1:n1) {
+		w2[i] ~ dnorm(x[i], tauu)
+	}
+
+	tauu ~ dgamma(tauu_alpha, tauu_beta)
+
+	gamma ~ dmnorm(gammamean,gammaprec)
+	
+	taux ~ dgamma(taux_alpha, taux_beta)
+
+	beta ~ dmnorm(betamean,betaprec)
+}

@@ -1,0 +1,53 @@
+data
+{
+for(i in 1:N) {
+  for(j in 1:T) {
+    Y[i,j] <- step(obs.t[i]-t[j]+eps)
+    dN[i,j] <- Y[i,j]*step(t[j+1]-obs.t[i]-eps)*fail[i]
+  }
+  out1[i] <- 0
+  cumSumIndex[i] <- sum(Y[i,])
+}
+} 
+
+
+model
+{
+
+dL0[1] ~ dgamma(muhaz[1],c)
+cumHaz[1] <- 0
+muhaz[1] <- dL0.star[1]*c
+dL0.star[1] <- r*(t[2]-t[1])
+for(j in 2:T) {
+  dL0[j] ~ dgamma(muhaz[j],c)
+  cumHaz[j] <- cumHaz[j-1] + dL0[j-1]
+  muhaz[j] <- dL0.star[j]*c
+  dL0.star[j] <- r*(t[j+1]-t[j])
+}
+cumHaz[T+1] <- cumHaz[T] + dL0[T]
+
+for(i in 1:N) {
+  out1[i] ~ dpois(cumHaz[cumSumIndex[i]]*exp(mu[i]))
+  fail[i] ~ dpois(dL0[cumSumIndex[i]]*exp(mu[i]))
+
+  mu[i]<-beta[1]*x[i]+beta[2]*z[i]
+  x[i]~dnorm(mux[i],taux)
+  mux[i]<-gamma[1]+gamma[2]*z[i]
+  w1[i]~dnorm(x[i],tauu)
+}
+for(i in 1:N1) {
+  w2[i]~dnorm(x[i],tauu)
+}
+
+beta ~ dmnorm(betamean,betaprec) 
+
+tauu~dgamma(tauu_alpha,tauu_beta)
+sigmau<-pow(tauu,-0.5)
+
+gamma~dmnorm(gammamean,gammaprec)
+
+taux~dgamma(taux_alpha,taux_beta)
+sigmax<-pow(taux,-0.5)
+
+} 
+
