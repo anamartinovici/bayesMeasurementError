@@ -1,0 +1,19 @@
+model
+{
+
+for(i in 1:n) {
+  is.censored[i] ~ dinterval(t[i], c[i])
+  t[i] ~ dweib(r, exp(mu[i]))
+
+  mu[i]<-beta[1]+beta[2]*sbp1[i]+beta[3]*sex[i]+beta[4]*age[i]+beta[5]*smoke[i]+beta[6]*diabetes[i]
+  
+}
+
+for (i in 1:6) {
+  beta[i] <- -r * log.scale[i]
+  log.scale[i] ~ dnorm(0, 1.0E-6)
+}
+r ~ dexp(0.001)
+
+} 
+
